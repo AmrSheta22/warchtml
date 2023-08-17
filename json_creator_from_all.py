@@ -5,11 +5,7 @@ import html
 # this code is for creating json file from all the html files in a directory
 def json_creater(directory):
     all_json = []
-    count = 0
     for i in os.listdir(directory):
-        count +=1
-        if count >10:
-            break
         with open("{}/{}".format(directory, i), "r", encoding="utf-8") as f:
             content = f.read()
             soup = bs(content, "html.parser")
@@ -38,7 +34,7 @@ def json_creater(directory):
             }
             all_json.append({i: data})
     # create a json file
-    with open("all_json.json", "w") as f:
+    with open("{}.json".format(directory), "w") as f:
         
         json.dump(all_json, f, indent=4)
             
@@ -51,8 +47,4 @@ def filter_tags(tags):
             a.replace_with("")
         if tag.text != "":
             filtered_tags.append(html.unescape(tag.text))
-            print(tag.text)
     return filtered_tags
-
-# call the function
-json_creater("merged")
