@@ -4,7 +4,7 @@ This project is for machine learning purposes on WARC files. It converts a direc
 ## Usage
 This project is built with python3 and the requirments for the project are stored in requirments.txt
 ```
-pip install -r requirments
+pip install -r requirments.txt
 ```
 Then you can run the code as follows:
 ```
