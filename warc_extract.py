@@ -7,7 +7,7 @@ from multiprocessing import Pool
 import zipfile
 from functools import partial
 import warnings
-
+import shutil
 # ignore warnings
 warnings.filterwarnings("ignore")
 
@@ -86,17 +86,11 @@ def is_html_file(record, extracted_number, zipped, extract, dump):
 # a function that takes a warc file and outputs all files in text format
 def warc_to_html(warc_file_path, zipped=True, extracted=True, multi=True, dump=False):
     # create directory extracted{n+1} if extracted{n} was found
-    extracted_number = 0
-    while "extracted" + str(extracted_number) in os.listdir("."):
+    extracted_number = 1
+    while "extracted{}.json".format(str(extracted_number-1)) in os.listdir("."):
         extracted_number += 1
-    os.makedirs("extracted" + str(extracted_number))
-    # same here but with extracted_dump, here we store things we don't need
-    while "extracted_dump" + str(extracted_number) in os.listdir("."):
-        extracted_number += 1
-    os.makedirs("extracted_dump" + str(extracted_number))
-    # same here but with extracted_dump, here we store things we don't need
-    while "extracted_dump" + str(extracted_number) in os.listdir("."):
-        extracted_number += 1
+    os.makedirs("extracted" + str(extracted_number-1))
+    os.makedirs("extracted_dump" + str(extracted_number-1))
 
     with open("extracted{}.json".format(extracted_number - 1), "w") as f:
         f.write("[\n")
@@ -126,7 +120,7 @@ def warc_to_html(warc_file_path, zipped=True, extracted=True, multi=True, dump=F
                     print(e)
 
         if multi:
-            with Pool(2) as p:
+            with Pool() as p:
                 for i in stream_data(warc_file):
                     p.apply_async(partial_func, args=(i,))
         else:
@@ -152,9 +146,9 @@ def warc_to_html(warc_file_path, zipped=True, extracted=True, multi=True, dump=F
         f.write("\n]")
     # delete the unwanted directory
     if not extracted:
-        os.rmdir("extracted" + str(extracted_number-1))
+        shutil.rmtree("extracted" + str(extracted_number-1))
     if not dump:
-        os.rmdir("extracted_dump" + str(extracted_number-1))
+        shutil.rmtree("extracted_dump" + str(extracted_number-1))
     return "extracted" + str(extracted_number - 1)
 
 
